@@ -1,0 +1,41 @@
+// ==============================
+// MISSION : FOYSAL-0731
+// JavaScript File
+// Created by Blink
+// ==============================
+
+// Welcome message in browser console
+console.log("🚀 Mission FOYSAL-0731 Initialized");
+
+// Show a welcome message only once per browser session
+window.onload = function () {
+
+    if (!sessionStorage.getItem("missionStarted")) {
+
+        alert("🚀 Welcome, Explorer!\n\nComplete every archive to unlock the final birthday message.");
+
+        sessionStorage.setItem("missionStarted", "yes");
+    }
+
+};
+
+function checkAnswer() {
+
+    let answer = document
+        .getElementById("answer")
+        .value
+        .toLowerCase()
+        .trim();
+
+    if (answer === "sigma sigma boi") {
+
+        window.location.href = "final.html";
+
+    } else {
+
+        document.getElementById("message").innerHTML =
+        "❌ Access Denied.<br>Hint: It all started with a nickname you didn't want.";
+
+    }
+
+}
