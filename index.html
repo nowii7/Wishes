@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🌌 MISSION LOG : F-0731 — Archive</title>
+<style>
+  :root{
+    --bg:#050816;
+    --panel:#07102a;
+    --accent:#8be9fd;
+    --muted:#9aa4b2;
+    --card:#0b1530;
+    --calm:#eaf6ff;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;color:var(--calm);background:var(--bg);overflow:hidden}
+  .app{position:relative;height:100vh;width:100vw;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+  /* Starfield */
+  .starfield{position:absolute;inset:0;overflow:hidden;z-index:0}
+  .star{position:absolute;background:var(--calm);border-radius:50%;opacity:.9;transform:translateZ(0)}
+  /* These will animate only after .active on body */
+  .moving .star{animation: drift var(--dur,40s) linear infinite}
+  @keyframes drift{
+    from{transform:translateY(-10vh) translateX(0) rotate(0)}
+    to{transform:translateY(110vh) translateX(20vw) rotate(360deg)}
+  }
+  / Shooting star - initially hidden /
+ .shoot{position:absolute;top:-10%;left:-10%;width:3px;height:3px;background:linear-gradient(90deg,#fff, #ffd1a9);box-shadow:0 0 10px rgba(255,210,150,0.9);transform:rotate(-25deg);opacity:0;pointer-events:none;z-index:5}
+ .shoot.animate{animation: shoot 1200ms ease-in-out forwards}
+ @keyframes shoot{
+ 0%{opacity:1;transform:translate(-10vw, -10vh) scale(1) rotate(-25deg)}
+ 100%{opacity:0;transform:translate(120vw, 120vh) scale(.6) rotate(-25deg)}
+ }
+
+  / Panels /
+ .panel{position:relative;z-index:2;max-width:880px;width:100%;background:linear-gradient(180deg,rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:26px;box-shadow:0 20px 60px rgba(2,6,23,0.7);backdrop-filter: blur(4px)}
+ .center{display:flex;flex-direction:column;gap:18px;align-items:flex-start}
+ h1{margin:0;font-size:20px;letter-spacing:0.6px;color:var(--accent);display:flex;align-items:center;gap:10px}
+ .muted{color:var(--muted);font-size:13px}
+ .terminal{background:linear-gradient(180deg, rgba(0,0,0,0.15), rgba(255,255,255,0.01));border-radius:8px;padding:16px;width:100%;box-sizing:border-box;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#dff7ff;line-height:1.45;font-size:14px}
+ .line{white-space:pre-wrap}
+ .prompt{display:flex;gap:12px;align-items:center}
+ .kbd{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);padding:6px 10px;border-radius:8px;color:var(--calm);font-weight:700}
+ .btn{background:linear-gradient(90deg,#7ee7ff22,#8be9fd11);color:var(--accent);border:1px solid rgba(139,233,253,0.12);padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700}
+ .btn:active{transform:translateY(1px)}
+ .small{font-size:13px;color:var(--muted)}
+  
+  
+  / Sections hidden/shown /
+ section{opacity:0;transform:translateY(6px);transition:opacity .5s ease, transform .45s ease;display:none}
+ section.visible{display:block;opacity:1;transform:translateY(0)}
+  
+  / Archive 01 layout /
+ .archive-meta{display:flex;gap:18px;align-items:flex-start}
+ .badge{width:118px;height:118px;border-radius:8px;background:linear-gradient(135deg,#7ee7ff22,#8be9fd33);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:16px;box-shadow:0 8px 30px rgba(11,21,48,0.6)}
+ .meta-list{flex:1}
+ .meta-item{margin-bottom:10px}
+ .label{color:var(--muted);font-size:12px}
+ .value{color:#eaf6ff;font-weight:700;margin-top:4px}
+  
+  
+  / Memories /
+ .memory{background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.02)}
+ .mission-title{font-weight:800;color:var(--accent);margin-bottom:6px}
+ .mission-block{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:rgba(0,0,0,0.08);padding:10px;border-radius:8px;border:1px dashed rgba(255,255,255,0.03);white-space:pre-wrap;color:#e8fbff}
+  
+  .controls{display:flex;gap:10px;align-items:center; margin-top:12px}
+  
+  
+  / fade to black overlay and final sentence /
+ .fade-overlay{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 1.4s ease;z-index:60;display:flex;align-items:center;justify-content:center}
+ .fade-overlay.show{opacity:1;pointer-events:auto}
+ .final-sentence{color:#fff;font-size:20px;opacity:0;transform:translateY(8px);transition:opacity .6s ease .6s, transform .6s ease .6s}
+ .fade-overlay.show .final-sentence{opacity:1;transform:translateY(0)}
+  
+  / responsive /
+ @media (max-width:680px){
+ .archive-meta{flex-direction:column;align-items:stretch}
+ .badge{width:94px;height:94px}
+ .input{width:100%}
+ }
+</style>
+  
+  </head>
+<body>
+<div class="app">
+  <div class="starfield" id="starfield"></div>
+  <div class="shoot" id="shoot"></div>
+  
+  <div class="panel">
+    <!-- Intro / Mission Log -->
+    <section id="intro" class="visible">
+      <div class="center">
+        <h1>🌌 MISSION LOG : F-0731</h1>
+        <div class="terminal" aria-live="polite">
+          <div class="line">Connecting to Deep Space...</div>
+          <div class="line small muted" id="dots">Receiving Signal</div>
+          <div class="line" style="margin-top:10px">...</div>
+          <div class="line" id="signal" style="margin-top:8px"></div>
+          <div style="margin-top:14px" class="prompt">
+            <div class="muted">Archive Found.</div>
+            <div style="flex:1"></div>
+            <div class="small muted">Press</div>
+            <div class="kbd">ENTER</div>
+          </div>
+        </div>
+        
+            <div style="display:flex;gap:10px;align-items:center;width:100%;justify-content:flex-end">
+      <button class="btn" id="enterBtn">ENTER</button>
+    </div>
+  </div>
+</section>
+
+<!-- Archive 01 -->
+<section id="archive1">
+  <div class="center">
+    <h1>📂 Archive 01</h1>
+    <div class="archive-meta">
+      <div class="badge">FOYSAL</div>
+      <div class="meta-list">
+        <div class="meta-item">
+          <div class="label">NAME</div>
+          <div class="value">Foysal</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Status</div>
+          <div class="value">Still one of the wisest people I've met.</div>
+        </div>
+        <div class="meta-item">
+          <div class="label">Category</div>
+          <div class="value">Anime watcher. Business dreamer. Story writer. Leo. Owner of the world's worst moustache decisions.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:100%" class="controls">
+      <div style="flex:1"></div>
+      <button class="btn" id="toMemBtn">Next Memory →</button>
+    </div>
+  </div>
+</section>
+
+<!-- Memories / Archive 02 -->
+<section id="memories">
+  <div class="center">
+    <h1>📂 Archive 02</h1>
+    <div class="memory" id="memoryBox">
+      <!-- Mission content inserted by JS -->
+    </div>
+
+    <div class="controls">
+      <div class="small muted" id="memCounter"></div>
+      <div style="flex:1"></div>
+      <button class="btn" id="nextMemBtn">Next Memory →</button>
+    </div>
+  </div>
+</section>
+
+<!-- Locked -->
+<section id="locked">
+  <div class="center locked">
+    <h1>🔐 Archive Locked</h1>
+    <div class="terminal">
+      <div class="line">One final file remains.</div>
+      <div class="line">Decrypting...</div>
+      <div class="line" style="margin-top:12px">Security Question:</div>
+      <div class="line small muted" style="margin-top:6px">What was my favourite nickname for him?</div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <input id="secretInput" class="input" placeholder="Type your answer here..." autocomplete="off" />
+        <button class="btn" id="unlockBtn">Unlock</button>
+      </div>
+      <div class="hint" id="unlockHint">(Hint: it's two words or just the first word)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Final Letter -->
+<section id="final">
+  <div class="center">
+    <div class="final" id="finalLetter" style="opacity:0;transform:translateY(6px);transition:opacity .6s ease, transform .6s ease">
+      <h2>Final Letter</h2>
+      <p>This part is intentionally calm.</p>
+      <p>Happy Birthday, Foysal.<br>
+      If you're reading this, then congratulations— you've successfully reached another level around the Sun.</p>
+
+      <p>Life has a funny way of changing people. Sometimes paths cross. Sometimes they quietly drift apart. Yet some memories never really disappear. Looking back, I'm genuinely grateful that our paths crossed.</p>
+
+      <p>Thank you for listening to countless random thoughts, for tolerating my endless talking, for giving your time, and for trying to understand me even when I wasn't easy to understand.</p>
+
+      <p>I know I probably treated you like an unpaid therapist more times than I should have.<br>
+      So... I'm sorry for that. And... Thank you. Thank you for staying patient. Thank you for respecting my boundaries. Thank you for sharing your thoughts honestly. Thank you for simply being someone I could talk to.</p>
+
+      <p>Not everyone who enters our lives is meant to stay forever. But some people leave behind lessons, memories, and gratitude that stay much longer. You're one of those people.</p>
+
+      <p>I hope your dreams become reality. I hope your business ideas succeed. I hope you keep writing stories. I hope you continue becoming someone your younger self would admire.</p>
+
+      <p>And... maybe... please retire the Hitler moustache one day. Humanity would appreciate it. 😂</p>
+
+      <p class="calm-footer">May Allah grant you wisdom, peace, good health, and success in both this life and the next.<br>Happy Birthday once again.<br>Thank you for being part of my story.<br>— Blink</p>
+    </div>
+  </div>
+</section>
+    </div>
+
+  <div class="fade-overlay" id="fadeOverlay">
+    <div class="final-sentence">End of Archive. Some people are chapters, not the whole book. Mission Complete.</div>
+  </div>
+</div>
+
+<script>
+  // Build starfield
+  const starfield = document.getElementById('starfield');
+  const STAR_COUNT = 120;
+  const stars = [];
+  for (let i=0;i<STAR_COUNT;i++){
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random()*2 + 1; // 1-3
+    s.style.width = size + 'px';
+    s.style.height = (size+Math.random()*2)+'px';
+    s.style.left = Math.random()*100 + 'vw';
+    s.style.top = Math.random()*100 + 'vh';
+    s.style.opacity = 0.6 + Math.random()*0.4;
+    s.style.boxShadow = '0 0 '+(2+Math.random()*6)+'px rgba(140,230,255,0.8)';
+    s.style.setProperty('--dur', (40 + Math.random()*90) + 's');
+    starfield.appendChild(s);
+    stars.push(s);
+  }
+
+  // tiny shooting star element
+    
+    const shoot = document.getElementById('shoot');
+
+  // Sections
+  const intro = document.getElementById('intro');
+  const archive1 = document.getElementById('archive1');
+  const memoriesSec = document.getElementById('memories');
+  const locked = document.getElementById('locked');
+  const final = document.getElementById('final');
+  const finalLetter = document.getElementById('finalLetter');
+  const fadeOverlay = document.getElementById('fadeOverlay');
+
+  const body = document.body;
+  const dots = document.getElementById('dots');
+  const signal = document.getElementById('signal');
+  const enterBtn = document.getElementById('enterBtn');
+
+  // Type "Receiving Signal..." ellipsis animation
+  let dotInterval = null;
+  function startDots(){
+    let c = 0;
+    dotInterval = setInterval(() => {
+      c = (c+1)%4;
+      dots.textContent = 'Receiving Signal' + '.'.repeat(c);
+    }, 450);
+  }
+  function stopDots(){
+    clearInterval(dotInterval);
+    dots.textContent = 'Receiving Signal...';
+      }
+  startDots();
+
+  // Simulate incoming signal messages
+  const messages = [
+    '...',
+    'Signal Received.',
+    'Archive Found.',
+    '',
+    'Archive Owner:',
+    'FOYSAL',
+    '',
+    'Status:',
+    'Accessible',
+    ''
+  ];
+  let msgIndex = 0;
+  function revealMessages(callback){
+    stopDots();
+    signal.textContent = '';
+    function addNext(){
+      if (msgIndex >= messages.length){
+        if (callback) callback();
+        return;
+      }
+      const txt = messages[msgIndex++];
+      if (txt === '') {
+        signal.textContent += '\\n';
+        setTimeout(addNext, 220);
+      } else {
+        signal.textContent += txt + '\\n';
+        setTimeout(addNext, 520);
+      }
+    }
+    addNext();
+  
+  // Memories data
+  const memories = [
+    {
+      title: 'Memory #001 — Sigma Sigma Boi Incident',
+      body: `Sigma Sigma Boi Incident
+
+Probability of winning:
+100%
+
+Probability of him being annoyed:
+Also 100%.
+
+Result:
+Mission Successful.
+Nickname Accepted.`
+    },
+    {
+      title: 'Memory #002 — The Legendary Meat Box',
+      body: `The Legendary Meat Box.
+
+Instructions:
+
+Mix sauce.
+Mix mayo.
+
+Subject's Action:
+
+✓ Ate fries.
+
+✓ Ate meat.
+
+✗ Ignored both sauces.
+
+Mission Review:
+
+    
+Chef's Kiss.
+
+    
+10/10 food.
+
+2/10 survival instincts.`
+    },
+    {
+      title: 'Memory #003 — Monkey',
+      body: `Monkey.
+
+Reason:
+
+Apparently standing on a swing like
+gravity doesn't exist.
+
+Conclusion:
+
+The nickname was...
+fair enough.`
+    },
+    {
+      title: 'Memory #004 — Grandma',
+      body: `Grandma.
+
+One of the hardest chapters.
+
+You listened.
+
+Even when my thoughts were all over
+the place.
+
+Thank you.
+No sad music.
+Just quiet.`
+    }
+  ];
+
+  const memoryBox = document.getElementById('memoryBox');
+  const memCounter = document.getElementById('memCounter');
+  const toMemBtn = document.getElementById('toMemBtn');
+  const nextMemBtn = document.getElementById('nextMemBtn');
+
+  let memIndex = 0;
+  function showMemory(i){
+    const m = memories[i];
+    memoryBox.innerHTML = `
+      <div class="mission-title">${m.title}</div>
+      <div class="mission-block">${m.body}</div>
+    `;
+    memCounter.textContent = `Memory ${i+1} of ${memories.length}`;
+  }
+
+  toMemBtn.addEventListener('click', () => {
+    archive1.classList.remove('visible'); archive1.style.display='none';
+    memoriesSec.classList.add('visible');
+    memIndex = 0;
+    showMemory(memIndex);
+  });
+
+  nextMemBtn.addEventListener('click', () => {
+    memIndex++;
+    if (memIndex < memories.length){
+      showMemory(memIndex);
+      // on each new memory, tiny subtle nudge
+      memoryBox.animate([{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:220,easing:'ease-out'});
+    } else {
+      // after final memory -> show Locked
+      memoriesSec.classList.remove('visible'); memoriesSec.style.display='none';
+      // play a tiny shooting star
+      triggerShootingStar();
+      setTimeout(() => {
+        locked.classList.add('visible');
+      }, 900);
+    }
+  });
+
+  // Shooting star function
+  function triggerShootingStar(){
+    shoot.classList.remove('animate');
+    // randomize start position a bit
+    shoot.style.left = (Math.random()*20 + 5) + 'vw';
+    shoot.style.top = (Math.random()*20 + 5) + 'vh';
+    // force reflow to restart animation
+    void shoot.offsetWidth;
+    shoot.classList.add('animate');
+  }
+
+  // Unlock logic
+  const unlockBtn = document.getElementById('unlockBtn');
+  const secretInput = document.getElementById('secretInput');
+  const unlockHint = document.getElementById('unlockHint');
+
+  function normalizeAnswer(s){
+    return s.trim().toLowerCase().replace(/[^a-z0-9 ]/g,'');
+  }
+  const validAnswers = ['sigma sigma boi','sigma'];
+
+  function attemptUnlock(){
+    const val = normalizeAnswer(secretInput.value || '');
+    if (validAnswers.includes(val)){
+      // success
+      unlockHint.textContent = 'Decrypting final file...';
+      unlockBtn.disabled = true;
+      secretInput.disabled = true;
+      setTimeout(() => {
+        locked.classList.remove('visible'); locked.style.display='none';
+        final.classList.add('visible');
+        // reveal final letter elegantly
+        finalLetter.style.opacity = 1;
+        finalLetter.style.transform = 'translateY(0)';
+        // after calm reading, fade to black and show final sentence
+        setTimeout(() => {
+          fadeOverlay.classList.add('show');
+        }, 7000); // give user some time to read
+      }, 900);
+    } else {
+      // shake input
+      secretInput.animate([{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:380});
+      unlockHint.textContent = 'Incorrect answer. Try common variants (case-insensitive).';
+    }
+  }
+
+  unlockBtn.addEventListener('click', attemptUnlock);
+  secretInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') attemptUnlock();
+  });
+
+  // Accessibility: focus management
+  enterBtn.addEventListener('click', () => enterBtn.blur());
+  toMemBtn.addEventListener('click', () => nextMemBtn.focus());
+  nextMemBtn.addEventListener('click', () => nextMemBtn.blur());
+
+  // small initial typewriter for signal to make it feel interactive
+  // we already reveal messages on Enter; this just decorates initial lines
+  // nothing else required
+</script>
+</body>
+   
+</html>
+    
