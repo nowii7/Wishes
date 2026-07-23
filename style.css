@@ -1,23 +1,14 @@
 body{
 
 margin:0;
-
 background:#020617;
-
 color:white;
-
 font-family:Arial;
-
 display:flex;
-
 justify-content:center;
-
 align-items:center;
-
 height:100vh;
-
 overflow:hidden;
-
 position:relative;
 
 }
@@ -25,66 +16,52 @@ position:relative;
 #game{
 
 text-align:center;
+position:relative;
+z-index:10;
 
 }
 
 h1{
 
 font-size:45px;
-
 color:#70d6ff;
-
-
-.star{
-
-width:2px;
-
-height:2px;
-
-background:white;
-
-position:absolute;
-
-border-radius:50%;
-
-animation:twinkle 2s infinite;
-
-}
-
-@keyframes twinkle{
-
-0%{
-
-opacity:0.2;
-
-transform:scale(1);
-
-}
-
-50%{
-
-opacity:1;
-
-transform:scale(2);
-
-}
-
-100%{
-
-opacity:0.2;
-
-transform:scale(1);
-
-}
-
-}
 
 }
 
 p{
 
 font-size:20px;
-
 color:#dddddd;
+
+}
+
+.star{
+
+position:absolute;
+width:2px;
+height:2px;
+background:white;
+border-radius:50%;
+animation:twinkle 2s infinite;
+box-shadow:0 0 5px white;
+
+}
+
+@keyframes twinkle{
+
+0%{
+opacity:.2;
+transform:scale(1);
+}
+
+50%{
+opacity:1;
+transform:scale(2);
+}
+
+100%{
+opacity:.2;
+transform:scale(1);
+}
 
 }
