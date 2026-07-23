@@ -1,1 +1,1 @@
-.
+console.log("Mission Started");
