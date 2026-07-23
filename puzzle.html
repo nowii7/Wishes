@@ -1,1 +1,92 @@
-.
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Final Security Check</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h4>FINAL SECURITY CHECK</h4>
+
+<h1>🔒 LAST GATE</h1>
+
+<p>
+
+Congratulations, Explorer.
+
+You've reached the final archive.
+
+One last security question remains...
+
+</p>
+
+<br>
+
+<p>
+
+<b>Question:</b>
+
+<br><br>
+
+What was the nickname you tried so hard to reject...
+
+but eventually surrendered to?😌
+
+</p>
+
+<br>
+
+<input
+type="text"
+id="answer"
+placeholder="Type your answer here">
+
+<br><br>
+
+<button onclick="checkAnswer()">
+
+UNLOCK FINAL ARCHIVE
+
+</button>
+
+<p id="message"></p>
+
+</div>
+
+<script>
+
+function checkAnswer(){
+
+let answer = document.getElementById("answer").value.toLowerCase().trim();
+
+if(answer=="sigma sigma boi"){
+
+window.location.href="final.html";
+
+}
+
+else{
+
+document.getElementById("message").innerHTML=
+
+"❌ Access Denied. Hint: You lost ";
+
+}
+
+}
+
+</script>
+
+</body>
+
+</html>
